@@ -11,8 +11,9 @@ namespace Patcher
     public static class SimplePatcher
     {
         /// <summary>
-        /// This is meant specifically for updating a destination object from a dynamic JObject receive, e.g. from
-        /// a Web API request.
+        /// <para>&quot;Patch&quot; as in &quot;PATCH&quot; the HTTP verb, where you apply partial updates to an object.</para>
+        /// <para>This is meant specifically for updating a destination object from a dynamic JObject received, e.g. from
+        /// a Web API request.</para>
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="source"></param>
@@ -41,6 +42,7 @@ namespace Patcher
             // Since we're operating on a dynamic object, C# will assume we want a dynamic returned if we declare the variable
             //   as var. As such, we have to be explicit about our return type here.
             Dictionary<string, object> sourcePropertyNamesAndValues = GetPropertyNamesAndValues(source);
+
             var destinationProperties = GetPublicInstanceProperties(destination);
             var destinationPropertyNames = destinationProperties.Select(pi => pi.Name).ToArray();
             var propertyNameComparison = ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
