@@ -6,6 +6,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Newtonsoft.Json.Linq;
+using Patcher.Extensions;
 
 namespace Patcher
 {
@@ -79,26 +80,14 @@ namespace Patcher
                     throw new InvalidOperationException($"Cannot write to destination property {destinationProperty.Name} of type {destination.GetType().FullName}");
                 }
 
-                if (ImplementsIEnumerable(destinationProperty))
+                if (!destinationProperty.PropertyType.IsDefaultUriBindableType())
                 {
-                    throw new NotSupportedException($"Destination properties implementing IEnumerable are not supported. Property: {destinationProperty.Name}; Type: {destinationProperty.PropertyType.FullName}");
+                    throw new NotSupportedException($"Destination properties implementing non-primitive, non-simple types are not supported. Property: {destinationProperty.Name}; Type: {destinationProperty.PropertyType.FullName}. See: http://www.asp.net/web-api/overview/formats-and-model-binding/parameter-binding-in-aspnet-web-api");
                 }
 
                 // Update the destination property value.
                 destinationProperty.SetValue(destination, ((JValue)sourcePropertyNameValue.Value).Value);
             }
-        }
-
-        private static bool ImplementsIEnumerable(PropertyInfo pi)
-        {
-            if (pi.PropertyType == typeof(string))
-            {
-                // Strings are allowable IEnumerables.
-                return false;
-            }
-
-            // Checking IEnumerable instead of IEnumerable<T> will catch older collection types, too.
-            return typeof(IEnumerable).IsAssignableFrom(pi.PropertyType);
         }
 
         private static Dictionary<string, object> GetPropertyNamesAndValues(dynamic value)
