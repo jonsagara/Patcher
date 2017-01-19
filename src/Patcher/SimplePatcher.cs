@@ -4,17 +4,32 @@ using System.Dynamic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using Newtonsoft.Json.Linq;
 
 namespace Patcher
 {
     public static class SimplePatcher
     {
-        public static void Patch<T>(dynamic source, T destination, bool ignoreCase = true, bool ignoreUnknownProperties = false)
+        /// <summary>
+        /// This is meant specifically for updating a destination object from a dynamic JObject receive, e.g. from
+        /// a Web API request.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <param name="destination"></param>
+        /// <param name="ignoreCase"></param>
+        /// <param name="ignoreUnknownProperties"></param>
+        public static void PatchFromJObject<T>(dynamic source, T destination, bool ignoreCase = true, bool ignoreUnknownProperties = false)
             where T : class
         {
             if (source == null)
             {
                 throw new ArgumentNullException(nameof(source));
+            }
+
+            if (source.GetType() != typeof(JObject))
+            {
+                throw new ArgumentException($"This method only works with dynamic objects of type JObject", nameof(source));
             }
 
             if (destination == null)
@@ -23,7 +38,9 @@ namespace Patcher
             }
 
 
-            var sourcePropertyNamesAndValues = GetPropertyNamesAndValues(source);
+            // Since we're operating on a dynamic object, C# will assume we want a dynamic returned if we declare the variable
+            //   as var. As such, we have to be explicit about our return type here.
+            Dictionary<string, object> sourcePropertyNamesAndValues = GetPropertyNamesAndValues(source);
             var destinationProperties = GetPublicInstanceProperties(destination);
             var destinationPropertyNames = destinationProperties.Select(pi => pi.Name).ToArray();
             var propertyNameComparison = ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
@@ -60,7 +77,7 @@ namespace Patcher
                 }
 
                 // Update the destination property value.
-                destinationProperty.SetValue(destination, sourcePropertyNameValue.Value);
+                destinationProperty.SetValue(destination, ((JValue)sourcePropertyNameValue.Value).Value);
             }
         }
 
