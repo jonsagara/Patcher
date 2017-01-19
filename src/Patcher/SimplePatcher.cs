@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
@@ -78,9 +79,9 @@ namespace Patcher
                     throw new InvalidOperationException($"Cannot write to destination property {destinationProperty.Name} of type {destination.GetType().FullName}");
                 }
 
-                if (ImplementsIEnumerableT(destinationProperty))
+                if (ImplementsIEnumerable(destinationProperty))
                 {
-                    throw new NotSupportedException($"Destination properties implementing IEnumerable<T> are not supported. Property: {destinationProperty.Name}; Type: {destinationProperty.PropertyType.FullName}");
+                    throw new NotSupportedException($"Destination properties implementing IEnumerable are not supported. Property: {destinationProperty.Name}; Type: {destinationProperty.PropertyType.FullName}");
                 }
 
                 // Update the destination property value.
@@ -88,17 +89,16 @@ namespace Patcher
             }
         }
 
-        private static bool ImplementsIEnumerableT(PropertyInfo pi)
+        private static bool ImplementsIEnumerable(PropertyInfo pi)
         {
             if (pi.PropertyType == typeof(string))
             {
-                // Strings are allowable IEnumerable<T>s.
+                // Strings are allowable IEnumerables.
                 return false;
             }
 
-            return pi.PropertyType
-                .GetInterfaces()
-                .Any(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IEnumerable<>));
+            // Checking IEnumerable instead of IEnumerable<T> will catch older collection types, too.
+            return typeof(IEnumerable).IsAssignableFrom(pi.PropertyType);
         }
 
         private static Dictionary<string, object> GetPropertyNamesAndValues(dynamic value)
