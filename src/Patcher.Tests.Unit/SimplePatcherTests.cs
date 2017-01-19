@@ -19,7 +19,7 @@ namespace Patcher.Tests.Unit
             dynamic sourceDyn = JsonConvert.DeserializeObject(JsonConvert.SerializeObject(sourceObj));
 
             var destination = new EmployeeNoMiddleName { FirstName = "Steve", LastName = "Stevenson" };
-            SimplePatcher.PatchFromJObject<EmployeeNoMiddleName>(sourceDyn, destination);
+            SimplePatcher.PatchFromJObject(sourceDyn, destination);
 
             destination.FirstName.ShouldBe(sourceObj.FirstName);
             destination.LastName.ShouldBe(sourceObj.LastName);
@@ -40,7 +40,7 @@ namespace Patcher.Tests.Unit
 
             Should.Throw<InvalidOperationException>(() =>
             {
-                SimplePatcher.PatchFromJObject<EmployeeNoMiddleName>(sourceDyn, destination);
+                SimplePatcher.PatchFromJObject(sourceDyn, destination);
             });
         }
 
@@ -57,7 +57,7 @@ namespace Patcher.Tests.Unit
             dynamic sourceDyn = JsonConvert.DeserializeObject(JsonConvert.SerializeObject(sourceObj));
             var destination = new EmployeeNoMiddleName { FirstName = "Steve", LastName = "Stevenson" };
 
-            SimplePatcher.PatchFromJObject<EmployeeNoMiddleName>(sourceDyn, destination, ignoreUnknownProperties: true);
+            SimplePatcher.PatchFromJObject(sourceDyn, destination, ignoreUnknownProperties: true);
             destination.FirstName.ShouldBe(sourceObj.FirstName);
             destination.LastName.ShouldBe(sourceObj.LastName);
         }
@@ -78,7 +78,7 @@ namespace Patcher.Tests.Unit
             dynamic sourceDyn = JsonConvert.DeserializeObject(JsonConvert.SerializeObject(sourceObj));
             var destination = new FullEmployee { FirstName = "Steve", LastName = "Stevenson", MiddleName = "Aero", DateOfBirth = dob, Dependents = dependents };
 
-            SimplePatcher.PatchFromJObject<EmployeeNoMiddleName>(sourceDyn, destination);
+            SimplePatcher.PatchFromJObject(sourceDyn, destination);
             destination.FirstName.ShouldBe(sourceObj.FirstName);
             destination.MiddleName.ShouldBe(sourceObj.MiddleName);
             destination.LastName.ShouldBe(sourceObj.LastName);
