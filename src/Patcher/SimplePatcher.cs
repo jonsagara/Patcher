@@ -13,7 +13,7 @@ namespace Patcher
         /// <summary>
         /// <para>&quot;Patch&quot; as in &quot;PATCH&quot; the HTTP verb, where you apply partial updates to an object.</para>
         /// <para>This is meant specifically for updating a destination object from a dynamic JObject received, e.g. from
-        /// a Web API request.</para>
+        /// a Web API request. It only works on simple types (string, int, etc.), hence the name SimplePatcher.</para>
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="source"></param>
@@ -78,11 +78,28 @@ namespace Patcher
                     throw new InvalidOperationException($"Cannot write to destination property {destinationProperty.Name} of type {destination.GetType().FullName}");
                 }
 
+                if (ImplementsIEnumerableT(destinationProperty))
+                {
+                    throw new NotSupportedException($"Destination properties implementing IEnumerable<T> are not supported. Property: {destinationProperty.Name}; Type: {destinationProperty.PropertyType.FullName}");
+                }
+
                 // Update the destination property value.
                 destinationProperty.SetValue(destination, ((JValue)sourcePropertyNameValue.Value).Value);
             }
         }
 
+        private static bool ImplementsIEnumerableT(PropertyInfo pi)
+        {
+            if (pi.PropertyType == typeof(string))
+            {
+                // Strings are allowable IEnumerable<T>s.
+                return false;
+            }
+
+            return pi.PropertyType
+                .GetInterfaces()
+                .Any(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IEnumerable<>));
+        }
 
         private static Dictionary<string, object> GetPropertyNamesAndValues(dynamic value)
         {
