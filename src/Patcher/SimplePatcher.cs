@@ -30,7 +30,7 @@ namespace Patcher
 
             if (source.GetType() != typeof(JObject))
             {
-                throw new ArgumentException($"This method only works with dynamic objects of type JObject", nameof(source));
+                throw new ArgumentException($"This method only works with dynamic objects of type {typeof(JObject).FullName}", nameof(source));
             }
 
             if (destination == null)
