@@ -122,19 +122,19 @@ namespace Patcher
             // Default, non-integer case.
             object destValue = ((JValue)sourcePropertyNameValue.Value).Value;
 
-            if (destinationProperty.PropertyType == typeof(int))
+            if (destinationProperty.PropertyType == typeof(int) && destValue != null)
             {
                 destValue = (int)(long)destValue;
             }
-            else if (destinationProperty.PropertyType == typeof(short))
+            else if (destinationProperty.PropertyType == typeof(short) && destValue != null)
             {
                 destValue = (short)(long)destValue;
             }
-            else if (destinationProperty.PropertyType == typeof(byte))
+            else if (destinationProperty.PropertyType == typeof(byte) && destValue != null)
             {
                 destValue = (byte)(long)destValue;
             }
-            else if (destinationProperty.PropertyType == typeof(long))
+            else if (destinationProperty.PropertyType == typeof(long) && destValue != null)
             {
                 destValue = (long)destValue;
             }
