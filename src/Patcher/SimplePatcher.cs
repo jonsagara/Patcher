@@ -119,28 +119,43 @@ namespace Patcher
             //   casting to the proper type here based on the destination type, or else we'll get a runtime exception
             //   about failing to cast an Int64 to an Int32.
 
-            object destValue;
+            // Default, non-integer case.
+            object destValue = ((JValue)sourcePropertyNameValue.Value).Value;
 
             if (destinationProperty.PropertyType == typeof(int))
             {
-                destValue = (int)(long)((JValue)sourcePropertyNameValue.Value).Value;
+                destValue = (int)(long)destValue;
             }
             else if (destinationProperty.PropertyType == typeof(short))
             {
-                destValue = (short)(long)((JValue)sourcePropertyNameValue.Value).Value;
+                destValue = (short)(long)destValue;
             }
             else if (destinationProperty.PropertyType == typeof(byte))
             {
-                destValue = (byte)(long)((JValue)sourcePropertyNameValue.Value).Value;
+                destValue = (byte)(long)destValue;
             }
             else if (destinationProperty.PropertyType == typeof(long))
             {
-                destValue = (long)((JValue)sourcePropertyNameValue.Value).Value;
+                destValue = (long)destValue;
             }
-            else
+            else if (destinationProperty.PropertyType.IsGenericType && destinationProperty.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
             {
-                // Default, non-integer case.
-                destValue = ((JValue)sourcePropertyNameValue.Value).Value;
+                if (destinationProperty.PropertyType == typeof(int?))
+                {
+                    destValue = (int?)(long?)destValue;
+                }
+                else if (destinationProperty.PropertyType == typeof(short?))
+                {
+                    destValue = (short?)(long?)destValue;
+                }
+                else if (destinationProperty.PropertyType == typeof(byte?))
+                {
+                    destValue = (byte?)(long?)destValue;
+                }
+                else if (destinationProperty.PropertyType == typeof(long?))
+                {
+                    destValue = (long?)destValue;
+                }
             }
 
             return destValue;
