@@ -9,10 +9,12 @@ using Patcher.Extensions;
 
 namespace Patcher
 {
+    /// <summary>
+    /// &quot;Patch&quot; as in &quot;PATCH&quot; the HTTP verb, where you apply partial updates to an object.
+    /// </summary>
     public static class SimplePatcher
     {
         /// <summary>
-        /// <para>&quot;Patch&quot; as in &quot;PATCH&quot; the HTTP verb, where you apply partial updates to an object.</para>
         /// <para>This is meant specifically for updating a destination object from a dynamic JObject received, e.g. from
         /// a Web API request. It only works on simple types (string, int, etc.), hence the name SimplePatcher.</para>
         /// </summary>
