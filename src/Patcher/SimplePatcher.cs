@@ -87,7 +87,35 @@ namespace Patcher
                 }
 
                 // Update the destination property value.
-                destinationProperty.SetValue(destination, ((JValue)sourcePropertyNameValue.Value).Value);
+                // A note regarding integer values (see http://stackoverflow.com/a/9444519/731):
+                //   Json.NET assumes all integer values as Int64 because it has no way of knowing whether it should use
+                //   Int32 or Int64, and with Int64 there is less likelihood of an overflow. We have to be smart about 
+                //   casting to the proper type here based on the destination type, or else we'll get a runtime exception
+                //   about failing to cast an Int64 to an Int32.
+                object destValue;
+                if (destinationProperty.PropertyType == typeof(int))
+                {
+                    destValue = (int)(long)((JValue)sourcePropertyNameValue.Value).Value;
+                }
+                else if (destinationProperty.PropertyType == typeof(short))
+                {
+                    destValue = (short)(long)((JValue)sourcePropertyNameValue.Value).Value;
+                }
+                else if (destinationProperty.PropertyType == typeof(byte))
+                {
+                    destValue = (byte)(long)((JValue)sourcePropertyNameValue.Value).Value;
+                }
+                else if (destinationProperty.PropertyType == typeof(long))
+                {
+                    destValue = (long)((JValue)sourcePropertyNameValue.Value).Value;
+                }
+                else
+                {
+                    // Default, non-integer case.
+                    destValue = ((JValue)sourcePropertyNameValue.Value).Value;
+                }
+
+                destinationProperty.SetValue(destination, destValue);
             }
         }
 
