@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Newtonsoft.Json;
-using Shouldly;
+﻿using Newtonsoft.Json;
 using Xunit;
 
 namespace Patcher.Tests.Unit
@@ -17,13 +14,13 @@ namespace Patcher.Tests.Unit
                 LastName = "Tomorrow"
             };
 
-            dynamic sourceDyn = JsonConvert.DeserializeObject(JsonConvert.SerializeObject(sourceObj));
+            dynamic? sourceDyn = JsonConvert.DeserializeObject(JsonConvert.SerializeObject(sourceObj));
 
             var destination = new EmployeeNoMiddleName { FirstName = "Steve", LastName = "Stevenson" };
             SimplePatcher.PatchFromJObject(sourceDyn, destination);
 
-            destination.FirstName.ShouldBe(sourceObj.FirstName);
-            destination.LastName.ShouldBe(sourceObj.LastName);
+            Assert.Equal(sourceObj.FirstName, destination.FirstName);
+            Assert.Equal(sourceObj.LastName, destination.LastName);
         }
 
         [Fact]
@@ -36,13 +33,10 @@ namespace Patcher.Tests.Unit
                 LastName = "Tomorrow"
             };
 
-            dynamic sourceDyn = JsonConvert.DeserializeObject(JsonConvert.SerializeObject(sourceObj));
+            dynamic? sourceDyn = JsonConvert.DeserializeObject(JsonConvert.SerializeObject(sourceObj));
             var destination = new EmployeeNoMiddleName { FirstName = "Steve", LastName = "Stevenson" };
 
-            Should.Throw<InvalidOperationException>(() =>
-            {
-                SimplePatcher.PatchFromJObject(sourceDyn, destination);
-            });
+            Assert.Throws<InvalidOperationException>(() => SimplePatcher.PatchFromJObject(sourceDyn, destination));
         }
 
         [Fact]
@@ -55,12 +49,13 @@ namespace Patcher.Tests.Unit
                 LastName = "Tomorrow"
             };
 
-            dynamic sourceDyn = JsonConvert.DeserializeObject(JsonConvert.SerializeObject(sourceObj));
+            dynamic? sourceDyn = JsonConvert.DeserializeObject(JsonConvert.SerializeObject(sourceObj));
             var destination = new EmployeeNoMiddleName { FirstName = "Steve", LastName = "Stevenson" };
 
             SimplePatcher.PatchFromJObject(sourceDyn, destination, ignoreUnknownProperties: true);
-            destination.FirstName.ShouldBe(sourceObj.FirstName);
-            destination.LastName.ShouldBe(sourceObj.LastName);
+
+            Assert.Equal(sourceObj.FirstName, destination.FirstName);
+            Assert.Equal(sourceObj.LastName, destination.LastName);
         }
 
         [Fact]
@@ -76,15 +71,16 @@ namespace Patcher.Tests.Unit
             var dob = DateTime.Parse("1980-01-01");
             var dependents = 3;
 
-            dynamic sourceDyn = JsonConvert.DeserializeObject(JsonConvert.SerializeObject(sourceObj));
+            dynamic? sourceDyn = JsonConvert.DeserializeObject(JsonConvert.SerializeObject(sourceObj));
             var destination = new FullEmployee { FirstName = "Steve", LastName = "Stevenson", MiddleName = "Aero", DateOfBirth = dob, Dependents = dependents };
 
             SimplePatcher.PatchFromJObject(sourceDyn, destination);
-            destination.FirstName.ShouldBe(sourceObj.FirstName);
-            destination.MiddleName.ShouldBe(sourceObj.MiddleName);
-            destination.LastName.ShouldBe(sourceObj.LastName);
-            destination.DateOfBirth.ShouldBe(dob);
-            destination.Dependents.ShouldBe(dependents);
+
+            Assert.Equal(sourceObj.FirstName, destination.FirstName);
+            Assert.Equal(sourceObj.MiddleName, destination.MiddleName);
+            Assert.Equal(sourceObj.LastName, destination.LastName);
+            Assert.Equal(dob, destination.DateOfBirth);
+            Assert.Equal(dependents, destination.Dependents);
         }
 
         [Fact]
@@ -95,7 +91,7 @@ namespace Patcher.Tests.Unit
                 FirstName = "Tommy",
                 MiddleName = "Hank",
                 LastName = "Tomorrow",
-                Children = new []
+                Children = new[]
                 {
                     "Dan",
                     "Marissa",
@@ -106,13 +102,10 @@ namespace Patcher.Tests.Unit
             var dob = DateTime.Parse("1980-01-01");
             var dependents = 3;
 
-            dynamic sourceDyn = JsonConvert.DeserializeObject(JsonConvert.SerializeObject(sourceObj));
+            dynamic? sourceDyn = JsonConvert.DeserializeObject(JsonConvert.SerializeObject(sourceObj));
             var destination = new FullEmployee { FirstName = "Steve", LastName = "Stevenson", MiddleName = "Aero", DateOfBirth = dob, Dependents = dependents };
 
-            Should.Throw<NotSupportedException>(() =>
-            {
-                SimplePatcher.PatchFromJObject(sourceDyn, destination);
-            });
+            Assert.Throws<NotSupportedException>(() => SimplePatcher.PatchFromJObject(sourceDyn, destination));
         }
 
         [Fact]
@@ -133,36 +126,33 @@ namespace Patcher.Tests.Unit
             var dob = DateTime.Parse("1980-01-01");
             var dependents = 3;
 
-            dynamic sourceDyn = JsonConvert.DeserializeObject(JsonConvert.SerializeObject(sourceObj));
+            dynamic? sourceDyn = JsonConvert.DeserializeObject(JsonConvert.SerializeObject(sourceObj));
             var destination = new FullEmployee { FirstName = "Steve", LastName = "Stevenson", MiddleName = "Aero", DateOfBirth = dob, Dependents = dependents, Spouse = new Person { FirstName = "Sally", LastName = "Stevenson" } };
 
-            Should.Throw<NotSupportedException>(() =>
-            {
-                SimplePatcher.PatchFromJObject(sourceDyn, destination);
-            });
+            Assert.Throws<NotSupportedException>(() => SimplePatcher.PatchFromJObject(sourceDyn, destination));
         }
     }
 
     public class EmployeeNoMiddleName
     {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
+        public string FirstName { get; set; } = null!;
+        public string LastName { get; set; } = null!;
     }
 
     public class FullEmployee : EmployeeNoMiddleName
     {
-        public string MiddleName { get; set; }
+        public string MiddleName { get; set; } = null!;
         public DateTime DateOfBirth { get; set; }
         public int Dependents { get; set; }
 
         public List<string> Children { get; private set; } = new List<string>();
 
-        public Person Spouse { get; set; }
+        public Person Spouse { get; set; } = null!;
     }
 
     public class Person
     {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
+        public string FirstName { get; set; } = null!;
+        public string LastName { get; set; } = null!;
     }
 }

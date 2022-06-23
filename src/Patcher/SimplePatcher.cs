@@ -111,7 +111,7 @@ namespace Patcher
             return propertyNamesAndValues;
         }
 
-        private static object GetDestinationValue(KeyValuePair<string, object> sourcePropertyNameValue, PropertyInfo destinationProperty)
+        private static object? GetDestinationValue(KeyValuePair<string, object> sourcePropertyNameValue, PropertyInfo destinationProperty)
         {
             // A note regarding integer values (see http://stackoverflow.com/a/9444519/731):
             //   Json.NET assumes all integer values are Int64 because it has no way of knowing whether it should use
@@ -120,7 +120,7 @@ namespace Patcher
             //   about failing to cast an Int64 to an Int32.
 
             // Default, non-integer case.
-            object destValue = ((JValue)sourcePropertyNameValue.Value).Value;
+            object? destValue = ((JValue)sourcePropertyNameValue.Value).Value;
 
             if (destinationProperty.PropertyType == typeof(int) && destValue != null)
             {
@@ -163,7 +163,7 @@ namespace Patcher
 
         private static PropertyInfo[] GetPublicInstanceProperties<T>(T value)
         {
-            return value
+            return value!
                 .GetType()
                 .GetProperties(BindingFlags.Public | BindingFlags.Instance)
                 .ToArray();
