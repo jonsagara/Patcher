@@ -36,7 +36,11 @@ namespace Patcher.Tests.Unit
             dynamic? sourceDyn = JsonConvert.DeserializeObject(JsonConvert.SerializeObject(sourceObj));
             var destination = new EmployeeNoMiddleName { FirstName = "Steve", LastName = "Stevenson" };
 
-            Assert.Throws<InvalidOperationException>(() => SimplePatcher.PatchFromJObject(sourceDyn, destination));
+            // We have to use this goofy syntax, or else C# thinks we want the Func<object> overload.
+            Assert.Throws<InvalidOperationException>(() =>
+            {
+                SimplePatcher.PatchFromJObject(sourceDyn, destination);
+            });
         }
 
         [Fact]
@@ -105,7 +109,11 @@ namespace Patcher.Tests.Unit
             dynamic? sourceDyn = JsonConvert.DeserializeObject(JsonConvert.SerializeObject(sourceObj));
             var destination = new FullEmployee { FirstName = "Steve", LastName = "Stevenson", MiddleName = "Aero", DateOfBirth = dob, Dependents = dependents };
 
-            Assert.Throws<NotSupportedException>(() => SimplePatcher.PatchFromJObject(sourceDyn, destination));
+            // We have to use this goofy syntax, or else C# thinks we want the Func<object> overload.
+            Assert.Throws<NotSupportedException>(() =>
+            {
+                SimplePatcher.PatchFromJObject(sourceDyn, destination);
+            });
         }
 
         [Fact]
@@ -127,9 +135,25 @@ namespace Patcher.Tests.Unit
             var dependents = 3;
 
             dynamic? sourceDyn = JsonConvert.DeserializeObject(JsonConvert.SerializeObject(sourceObj));
-            var destination = new FullEmployee { FirstName = "Steve", LastName = "Stevenson", MiddleName = "Aero", DateOfBirth = dob, Dependents = dependents, Spouse = new Person { FirstName = "Sally", LastName = "Stevenson" } };
+            var destination = new FullEmployee 
+            { 
+                FirstName = "Steve", 
+                LastName = "Stevenson", 
+                MiddleName = "Aero", 
+                DateOfBirth = dob, 
+                Dependents = dependents, 
+                Spouse = new Person 
+                { 
+                    FirstName = "Sally", 
+                    LastName = "Stevenson" 
+                } 
+            };
 
-            Assert.Throws<NotSupportedException>(() => SimplePatcher.PatchFromJObject(sourceDyn, destination));
+            // We have to use this goofy syntax, or else C# thinks we want the Func<object> overload.
+            Assert.Throws<NotSupportedException>(() =>
+            {
+                SimplePatcher.PatchFromJObject(sourceDyn, destination);
+            });
         }
     }
 
